@@ -18,9 +18,8 @@ import org.newdawn.slick.SlickException;
  * @author AMD
  */
 public class Game extends BasicGame {
-
-    private static int height = 480;
-    private static int width = 640;
+    static int height = 480;
+    static int width = 640;
     private static boolean fullscreen = false;
     private static boolean showFPS = true;
     private static String title = "Slick Basic Game Template";
@@ -28,9 +27,9 @@ public class Game extends BasicGame {
     static Player helicopter;
     static Gummy gummyBoss;
     private static Input input;
+    static float speedmodifier = 1;
     
     //temporary
-    private int movespeed = 5;
     private LinkedList<Projectile>bullets = new LinkedList<Projectile>();
 
     public Game(String title) {
@@ -40,7 +39,7 @@ public class Game extends BasicGame {
     @Override
     public void init(GameContainer gc) throws SlickException {
         try {
-            helicopter = new Player(new Image("assets/player.png"));
+            helicopter = new Player(new Image("assets/player.png"), 250);
             gummyBoss = new Gummy(new Image("assets/gummy.png"));
         } catch (SlickException ex) {
             ex.printStackTrace();
@@ -52,26 +51,32 @@ public class Game extends BasicGame {
     @Override
     public void update(GameContainer gc, int delta) throws SlickException {
         input = gc.getInput();
+        int x = 0,y = 0;
         if (input.isKeyDown(Input.KEY_W)) {
-            helicopter.shift(0, -movespeed);
+            y -= 1;
         }
         if (input.isKeyDown(Input.KEY_A)) {
-            helicopter.shift(-movespeed, 0);
+            x -= 1;
         }
         if (input.isKeyDown(Input.KEY_S)) {
-            helicopter.shift(0, movespeed);
+            y += 1;
         }
         if (input.isKeyDown(Input.KEY_D)) {
-            helicopter.shift(movespeed, 0);
+            x += 1;
         }
-        if(input.isKeyDown(Input.KEY_SPACE)){
+        if((x != 0)||(y != 0)){
+            helicopter.shift(x,y, delta);
+        }
+        
+        if(input.isMouseButtonDown(0)){
             Projectile temp = new Projectile(new Image("assets/bullet.png"),helicopter.getX(),helicopter.getY());
             bullets.add(temp);
-            temp.fire(gummyBoss.getX()+gummyBoss.getWidth()/2, gummyBoss.getY()+gummyBoss.getWidth()/2);
+            temp.fire(input.getMouseX(), input.getMouseY());
         }
         
         for(Projectile temp:bullets){
-            temp.update();
+            temp.update(delta);
+            temp.checkCollision(gummyBoss);
         }
         
         for(int i = 0; i < bullets.size(); ++i){
@@ -80,16 +85,20 @@ public class Game extends BasicGame {
                 --i;
             }
         }
+        helicopter.update();
+        gummyBoss.update();
         
     }
 
     @Override
     public void render(GameContainer gc, Graphics g) throws SlickException {
-        gummyBoss.render();
+        if(gummyBoss.isAlive())gummyBoss.render();
         for(Projectile temp:bullets){
             temp.render();
         }
-        helicopter.render();
+        if(helicopter.isAlive())helicopter.render();
+        g.drawString("Boss " + gummyBoss.getHealth() + " HP", 200, 10);
+        g.drawString("Player " + helicopter.getHealth() + " HP", 400, 10);
     }
 
     public static void main(String[] args) throws SlickException {

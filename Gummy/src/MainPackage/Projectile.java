@@ -11,12 +11,11 @@ import org.newdawn.slick.Image;
  * @author AMD
  */
 public class Projectile extends Sprite{
-    private float initialx, initialy, vectorx, vectory, destinationx, destinationy,
-            speed;
+    private float initialx, initialy, vectorx, vectory, destinationx, destinationy;
     private boolean finished;
 
     public Projectile(Image srcTex, float x, float y) {
-        super(srcTex);
+        super(srcTex,1000);
         initialx = x;
         initialy = y;
     }
@@ -29,25 +28,33 @@ public class Projectile extends Sprite{
 
     public void fire(float targetx, float targety){
         move(initialx, initialy);
-        speed = 10;
         destinationx = targetx;
         destinationy = targety;
-        double hypotenuse = Math.sqrt(Math.pow((destinationx - initialx), 2) + 
-                Math.pow(destinationy - initialy, 2));
+        double hypotenuse = Math.sqrt((destinationx - initialx)*(destinationx - initialx) + 
+                (destinationy - initialy)*(destinationy - initialy));
         
         //check if the distance between where the projectile stated and the target is greater then speed
-        if(hypotenuse > speed){
-            vectorx = (float)(speed * (destinationx - initialx) / hypotenuse);
-            vectory = (float)(speed * (destinationy - initialy) / hypotenuse);
+        if(hypotenuse > getSpeed()){
+            vectorx = (float)(getSpeed() * (destinationx - initialx) / hypotenuse);
+            vectory = (float)(getSpeed() * (destinationy - initialy) / hypotenuse);
         } else {
             finished = true;
         }
     }
     
-    public void update(){
-        shift(vectorx,vectory);
-        if(Math.sqrt(Math.pow((destinationx - getX()), 2) + 
-                Math.pow(destinationy - getY(), 2)) < speed){
+    public void update(int timems){
+        double hypotenuse = Math.sqrt((vectorx*vectorx)+ (vectory*vectory));
+        move((float)(getX() + Game.speedmodifier * getSpeed() * timems * vectorx / hypotenuse),
+        (float)(getY() + Game.speedmodifier * getSpeed() * timems * vectory / hypotenuse));
+        finished = (getX() < 0)?true:finished;
+        finished = (getX() > Game.width)?true:finished;
+        finished = (getY() < 0)?true:finished;
+        finished = (getY() > Game.height)?true:finished;
+    }
+    
+    public void checkCollision(Entity other){
+        if(!finished&&other.isAlive()&&collided(other)){
+            other.setHealth(other.getHealth()-1);
             finished = true;
         }
     }

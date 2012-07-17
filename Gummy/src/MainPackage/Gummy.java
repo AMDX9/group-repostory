@@ -11,7 +11,6 @@ import org.newdawn.slick.Image;
  * @author AMD
  */
 public class Gummy extends Entity{
-    
     public static final int GUMMY_INITAL_HEALTH = 5000;
 
     public Gummy(Image srcTex) {

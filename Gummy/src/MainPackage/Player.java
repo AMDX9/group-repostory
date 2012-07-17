@@ -22,5 +22,13 @@ public class Player extends Entity{
         super(PLAYER_INITIAL_HEALTH, srcTex, targetWidth, targetHeight);
     }
 
+    public Player(Image srcTex, float spriteSpeed) {
+        super(PLAYER_INITIAL_HEALTH, srcTex, spriteSpeed);
+    }
+
+    public Player(Image srcTex, int targetWidth, int targetHeight, float spriteSpeed) {
+        super(PLAYER_INITIAL_HEALTH, srcTex, targetWidth, targetHeight, spriteSpeed);
+    }
+
     
 }

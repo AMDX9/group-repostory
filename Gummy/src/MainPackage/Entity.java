@@ -12,6 +12,7 @@ import org.newdawn.slick.Image;
  * @author AMD
  */
 public class Entity extends Sprite {
+    private boolean alive = true;
     private int health;
 
     public Entity(int health, Image srcTex, int targetWidth, int targetHeight) {
@@ -24,12 +25,30 @@ public class Entity extends Sprite {
         this.health = health;
     }
 
+    public Entity(int health, Image srcTex, int targetWidth, int targetHeight, float spriteSpeed) {
+        super(srcTex, targetWidth, targetHeight, spriteSpeed);
+        this.health = health;
+    }
+
+    public Entity(int health, Image srcTex, float spriteSpeed) {
+        super(srcTex, spriteSpeed);
+        this.health = health;
+    }
+
     public int getHealth() {
         return health;
     }
 
     public void setHealth(int health) {
         this.health = health;
+    }
+    
+    public void update(){
+        alive = (health <= 0)?false:alive;
+    }
+
+    public boolean isAlive() {
+        return alive;
     }
     
     
